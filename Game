@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WITCHES OF HOLLOW HAVEN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --accent:#c5a8ff;
+    --accent-strong:#7b57ff;
+    --accent-dark:#542aff;
+    --bg:#050510;
+    --card:#111225;
+    --border:#6a3cff;
+    --muted:#9b9bbf;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    background:radial-gradient(circle at top,#1b1635 0,#050510 55%);
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    margin:0;
+  }
+  #game{
+    width:900px;
+    max-width:95vw;
+    margin:auto;
+    margin-top:16px;
+    margin-bottom:24px;
+    border:2px solid var(--border);
+    padding:16px;
+    background:rgba(7,7,24,0.98);
+    border-radius:16px;
+    box-shadow:0 0 24px rgba(117,82,255,0.45);
+  }
+  @media (max-width:600px){
+    #game{
+      padding:12px;
+      margin-top:10px;
+    }
+  }
+
+  h1{
+    text-align:center;
+    color:var(--accent);
+    margin:0 0 6px 0;
+    font-size: clamp(1.5rem, 5vw, 2.1rem);
+    letter-spacing:0.05em;
+  }
+  #subtitle{
+    text-align:center;
+    font-size:0.9rem;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+
+  #story{
+    min-height:160px;
+    font-size:16px;
+    line-height:1.5em;
+    padding:10px 12px;
+    border-radius:10px;
+    background:#0b0b1c;
+    border:1px solid #333368;
+    overflow-wrap:break-word;
+  }
+
+  .sectionTitle{
+    margin-top:10px;
+    margin-bottom:4px;
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--muted);
+  }
+
+  .btnArea{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:8px;
+  }
+  .btnArea button{
+    flex:1 1 calc(50% - 8px);
+    min-width:120px;
+    background:var(--accent-dark);
+    border:none;
+    padding:10px 8px;
+    border-radius:10px;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+    text-align:center;
+    line-height:1.3;
+    transition:transform 0.05s ease, box-shadow 0.1s ease, background 0.1s ease;
+  }
+  .btnArea button:active{
+    transform:scale(0.97);
+    box-shadow:0 0 12px rgba(197,168,255,0.5);
+  }
+  .btnArea button:hover{
+    background:var(--accent-strong);
+  }
+  @media (max-width:480px){
+    .btnArea button{
+      flex:1 1 100%;
+      font-size:15px;
+      padding:11px 10px;
+    }
+  }
+
+  .statBarWrap{
+    margin-bottom:6px;
+  }
+  .statLabel{
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-bottom:2px;
+  }
+  .statBar{
+    height:20px;
+    border-radius:999px;
+    overflow:hidden;
+    margin:0;
+    background:#272744;
+    border:1px solid #34345f;
+  }
+  .fill{
+    height:100%;
+    width:100%;
+    transition:width 0.25s ease-out;
+  }
+  #playerHP .fill{background:#27ff6a;}
+  #playerMana .fill{background:#3acbff;}
+  #enemyHP .fill{background:#ff5b5b;}
+
+  #log{
+    height:140px;
+    background:#050510;
+    border-radius:10px;
+    padding:8px;
+    overflow-y:auto;
+    border:1px solid #303065;
+    font-size:13px;
+  }
+
+  #enemyBox{
+    display:none;
+    margin-top:6px;
+    padding:8px 10px;
+    border-radius:10px;
+    background:#170f23;
+    border:1px solid #7443ff;
+  }
+
+  #enemyName{
+    margin:0 0 4px 0;
+    font-size:1rem;
+    color:#ff9b9b;
+  }
+
+  .tagRow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:6px;
+    font-size:11px;
+  }
+  .tag{
+    padding:3px 7px;
+    border-radius:999px;
+    border:1px solid #49498b;
+    color:#bfbfe8;
+  }
+
+  #topRow{
+    display:flex;
+    flex-direction:row;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  #leftCol{
+    flex:2 1 280px;
+  }
+  #rightCol{
+    flex:1 1 200px;
+  }
+
+  @media (max-width:700px){
+    #topRow{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<div id="game">
+  <h1>WITCHES OF HOLLOW HAVEN</h1>
+  <div id="subtitle">A small Charmed-inspired web RPG • v2</div>
+
+  <div class="tagRow">
+    <div class="tag">Story-driven</div>
+    <div class="tag">Turn-based magic combat</div>
+    <div class="tag">Light hub exploration</div>
+  </div>
+
+  <div id="topRow">
+    <div id="leftCol">
+      <div id="story"></div>
+      <div class="btnArea" id="buttons"></div>
+    </div>
+
+    <div id="rightCol">
+      <div id="enemyBox">
+        <h2 id="enemyName"></h2>
+        <div class="statBarWrap">
+          <div class="statLabel">Enemy Essence</div>
+          <div class="statBar" id="enemyHP"><div class="fill"></div></div>
+        </div>
+      </div>
+
+      <div class="sectionTitle">Your Status</div>
+      <div class="statBarWrap">
+        <div class="statLabel">Life</div>
+        <div class="statBar" id="playerHP"><div class="fill"></div></div>
+      </div>
+      <div class="statBarWrap">
+        <div class="statLabel">Mana</div>
+        <div class="statBar" id="playerMana"><div class="fill"></div></div>
+      </div>
+
+      <div class="sectionTitle">Battle & World Log</div>
+      <div id="log"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== CORE STATE =====
+  let storyEl = document.getElementById("story");
+  let btnArea = document.getElementById("buttons");
+  let log = document.getElementById("log");
+
+  let player = {
+    hp:100,
+    mana:100,
+    maxHP:100,
+    maxMana:100,
+    alive:true
+  };
+
+  let enemy = null;
+  let victories = 0;
+  let hexUnlocked = false;
+  let wardActive = false;
+
+  function logMsg(txt){
+    const time = new Date();
+    const stamp = time.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    log.innerHTML += `<span style="color:#6161a6;">[${stamp}]</span> ${txt}<br>`;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function updateBars(){
+    document.querySelector("#playerHP .fill").style.width =
+      (player.hp/player.maxHP*100)+"%";
+    document.querySelector("#playerMana .fill").style.width =
+      (player.mana/player.maxMana*100)+"%";
+
+    if(enemy){
+      document.querySelector("#enemyHP .fill").style.width =
+        (enemy.hp/enemy.maxHP*100)+"%";
+    }
+  }
+
+  function setStory(text){
+    storyEl.innerHTML = text;
+  }
+
+  function setButtons(list){
+    btnArea.innerHTML="";
+    list.forEach(btn=>{
+      let b=document.createElement("button");
+      b.innerText=btn.text;
+      b.onclick=btn.action;
+      btnArea.appendChild(b);
+    });
+  }
+
+  // ===== GAME FLOW =====
+  function resetPlayer(){
+    player.hp = player.maxHP;
+    player.mana = player.maxMana;
+    player.alive = true;
+    wardActive = false;
+    updateBars();
+  }
+
+  function startGame(){
+    victories = 0;
+    hexUnlocked = false;
+    wardActive = false;
+    resetPlayer();
+    enemy = null;
+    document.getElementById("enemyBox").style.display="none";
+    log.innerHTML="";
+    logMsg("Your witch senses flicker awake…");
+
+    setStory(`
+      You are one of the last great witches of <b>Hollow Haven</b> — 
+      a hidden magical city constantly under threat from demonic intruders.<br><br>
+      Tonight, the air cracks with power. Windows rattle. Streetlamps flicker violet.<br><br>
+      Somewhere nearby, a tear in reality has opened… and something has stepped through.
+    `);
+    setButtons([
+      {text:"Investigate the disturbance", action:firstScene},
+      {text:"Consult the Book of Shadows", action:bookScene}
+    ]);
+    updateBars();
+  }
+
+  function firstScene(){
+    setStory(`
+      You follow the pull of warped magic to an abandoned side street.<br><br>
+      The air is thick — like breathing smoke and static at the same time.<br><br>
+      A demon stands across from you: towering, horned, eyes burning with a dull,
+      hungry red.<br><br>
+      <i>"Little witch…"</i> it snarls. <i>"You should have stayed hidden."</i>
+    `);
+    spawnEnemy("Infernal Hunter", 110, 12);
+    setButtons([
+      {text:"Stand your ground and fight", action:battleMenu}
+    ]);
+  }
+
+  function bookScene(){
+    setStory(`
+      In your attic sanctum, candles ignite themselves as you open the
+      dust-heavy <b>Book of Shadows</b>.<br><br>
+      Pages flip on their own, stopping at a new entry — one you’ve never seen before:<br><br>
+      <i>"When the Veil frays and demon generals pass through, a witch of both
+      heart and will must rise. They will not fight alone… if they survive the first night."</i><br><br>
+      The house shudders. Something outside has sensed that you’re reading this.
+    `);
+    setButtons([
+      {text:"Brace yourself and face whatever found you", action:firstScene}
+    ]);
+  }
+
+  // ===== ENEMIES =====
+  function spawnEnemy(name,hp,atk){
+    enemy = {name:name, hp:hp, maxHP:hp, atk:atk};
+    document.getElementById("enemyName").innerText=name;
+    document.getElementById("enemyBox").style.display="block";
+    logMsg(`A ${name} appears, dripping with corrupted magic.`);
+    updateBars();
+  }
+
+  function spawnRandomStreetEnemy(){
+    let roll = Math.random();
+    if(roll < 0.5){
+      spawnEnemy("Shadow Wraith", 85, 10);
+    }else{
+      spawnEnemy("Glass-Eyed Stalker", 95, 11);
+    }
+    battleMenu();
+  }
+
+  // ===== BATTLE =====
+  function battleMenu(){
+    if(!enemy || enemy.hp<=0){
+      winBattle();
+      return;
+    }
+    setStory(`
+      The demon advances. Magic crackles at your fingertips,
+      eager to be shaped.<br><br>
+      Choose your spell wisely — you’re not just defending yourself.
+      You’re defending all of Hollow Haven.
+    `);
+
+    let btns = [
+      {text:"🧊 Freeze Spell\n(Stun / Low Damage)", action:freezeSpell},
+      {text:"🌀 Telekinetic Blast\n(Solid Damage)", action:pushSpell},
+      {text:"🔥 Energy Surge\n(High Damage)", action:blastSpell},
+      {text:"✨ Heal\n(Restore Life)", action:healSpell},
+      {text:"🛡 Ward Sigil\n(Reduce next hit)", action:wardSpell}
+    ];
+
+    if(hexUnlocked){
+      btns.push({text:"🕯 Hex of Binding\n(Heavy, risky)", action:hexSpell});
+    }
+
+    setButtons(btns);
+  }
+
+  function enemyTurn(){
+    if(!enemy || enemy.hp<=0) return;
+
+    let dmg = enemy.atk + Math.floor(Math.random()*6);
+
+    if(wardActive){
+      dmg = Math.floor(dmg * 0.4);
+      logMsg("Your ward sigil flares, soaking most of the attack.");
+      wardActive = false;
+    }
+
+    player.hp -= dmg;
+    if(player.hp<0) player.hp=0;
+    logMsg(enemy.name+" strikes you for <b>"+dmg+"</b> life.");
+    updateBars();
+    if(player.hp<=0){
+      loseGame();
+    } else {
+      setTimeout(battleMenu,500);
+    }
+  }
+
+  function cost(amount){
+    if(player.mana<amount){
+      logMsg("Your magic sputters — not enough mana.");
+      enemyTurn();
+      return false;
+    }
+    player.mana-=amount;
+    updateBars();
+    return true;
+  }
+
+  function freezeSpell(){
+    if(!cost(20))return;
+    logMsg("You fling a chilling incantation — frost crystals race up the demon’s limbs.");
+    enemy.hp -= 16;
+    if(enemy.hp<0) enemy.hp=0;
+    updateBars();
+    // Freeze: enemy skips a turn
+    setTimeout(()=>{
+      logMsg("The demon struggles against the ice, losing a precious moment.");
+      battleMenu();
+    }, 700);
+  }
+
+  function pushSpell(){
+    if(!cost(18))return;
+    logMsg("Telekinetic force slams the demon backward into unseen walls of power.");
+    enemy.hp -= 20;
+    if(enemy.hp<0) enemy.hp=0;
+    updateBars();
+    setTimeout(enemyTurn,700);
+  }
+
+  function blastSpell(){
+    if(!cost(28))return;
+    let dmg = 25 + Math.floor(Math.random()*12);
+    logMsg("You channel raw, crackling energy and hurl it in a blazing arc!");
+    enemy.hp -= dmg;
+    if(enemy.hp<0) enemy.hp=0;
+    updateBars();
+    setTimeout(enemyTurn,750);
+  }
+
+  function healSpell(){
+    if(!cost(24))return;
+    let heal=30 + Math.floor(Math.random()*8);
+    player.hp+=heal;
+    if(player.hp>player.maxHP)player.hp=player.maxHP;
+    logMsg("Soft light coils around you, knitting flesh and steadying your breath (+"
+           +heal+" life).");
+    updateBars();
+    setTimeout(enemyTurn,650);
+  }
+
+  function wardSpell(){
+    if(!cost(16))return;
+    wardActive = true;
+    logMsg("You trace a quick sigil in the air — a temporary ward hums at your side.");
+    setTimeout(enemyTurn,600);
+  }
+
+  function hexSpell(){
+    if(!cost(35))return;
+    let dmg = 30 + Math.floor(Math.random()*18);
+    logMsg("You whisper a forbidden binding, shadows crawling up the demon’s form.");
+    enemy.hp -= dmg;
+    if(enemy.hp<0) enemy.hp=0;
+    updateBars();
+
+    // Small self-recoil
+    let recoil = 5 + Math.floor(Math.random()*6);
+    player.hp -= recoil;
+    if(player.hp<0) player.hp=0;
+    logMsg("The hex bites back, stinging your own spirit (-"+recoil+" life).");
+    updateBars();
+
+    if(player.hp<=0){
+      loseGame();
+    }else{
+      setTimeout(enemyTurn,750);
+    }
+  }
+
+  function winBattle(){
+    if(!enemy) return;
+    logMsg("The "+enemy.name+" collapses into drifting embers and ash.");
+    enemy=null;
+    document.getElementById("enemyBox").style.display="none";
+    victories++;
+
+    if(victories===1){
+      setStory(`
+        The demon’s body disintegrates, scattering ash that briefly forms a sigil
+        in the air — a mark you don’t recognize.<br><br>
+        Its final whisper crawls under your skin:<br>
+        <i>"…We are only the beginning, witch."</i><br><br>
+        The streets are momentarily quiet. You know this isn’t over.<br><br>
+        Your attic sanctum — your safe place, your war room — calls to you.
+      `);
+    } else {
+      setStory(`
+        Another demon falls to your magic, its essence scattering like broken glass
+        across the veil.<br><br>
+        Hollow Haven breathes a little easier… for a moment.
+      `);
+    }
+
+    setButtons([
+      {text:"Return to your Sanctum", action:hubScene}
+    ]);
+  }
+
+  function loseGame(){
+    setStory(`
+      Your knees hit the cobblestones. Magic slips through your fingers like water.<br><br>
+      The last thing you see is the demon’s grin as the world fades to black.<br><br>
+      Hollow Haven dims… but witches are stubborn. And time, in magic, is a circle.
+    `);
+    setButtons([
+      {text:"Try Again (Rewind Time)", action:startGame}
+    ]);
+    logMsg("Your story ends… for now.");
+  }
+
+  // ===== HUB / SANCTUM =====
+  function hubScene(){
+    resetPlayer();
+
+    let extra = "";
+    if(victories===1){
+      extra = `
+        The symbol you saw in the demon’s ashes still burns behind your eyes.
+        You sketch it on a page of the Book of Shadows — and the ink writhes,
+        as if the page itself recognizes it.<br><br>
+      `;
+    }else if(victories>1){
+      extra = `
+        Demonic attacks are becoming more frequent. The map of Hollow Haven on
+        your wall is filling with pins and circles of thread.<br><br>
+      `;
+    }
+
+    setStory(`
+      You’re back in your attic sanctum — a riot of candles, crystals,
+      potion bottles, and shelves of impossible books.<br><br>
+      ${extra}
+      This is your base. Your shield. Your battlefield planning table.
+      From here, you decide how to fight back.
+    `);
+
+    let hubButtons = [
+      {text:"💤 Rest & Recenter\n(Full heal)", action:hubRest},
+      {text:"📖 Research in the Book of Shadows", action:hubResearch},
+      {text:"🌙 Patrol the Streets for Demons", action:hubPatrol}
+    ];
+
+    if(victories>=2){
+      hubButtons.push({
+        text:"⚠ Confront the Rising Threat",
+        action:hubBossTease
+      });
+    }
+
+    hubButtons.push({
+      text:"⏹ End Chapter (For Now)",
+      action:endChapter
+    });
+
+    setButtons(hubButtons);
+  }
+
+  function hubRest(){
+    resetPlayer();
+    logMsg("You breathe, meditate, and draw magic back into your veins. Fully restored.");
+    setStory(`
+      You stretch out on the worn couch beneath shelves of potion ingredients,
+      letting the steady hum of protective wards lull your nerves.<br><br>
+      When you rise, your hands are steady. Your magic feels sharp again.
+    `);
+    setButtons([
+      {text:"Back to Sanctum Choices", action:hubScene}
+    ]);
+  }
+
+  function hubResearch(){
+    if(!hexUnlocked){
+      hexUnlocked = true;
+      logMsg("New spell unlocked: Hex of Binding.");
+      setStory(`
+        You flip through the Book of Shadows, following a flick of intuition.
+        Pages stop on a half-erased entry — a spell crossed out as
+        <i>"too dangerous to use lightly"</i>.<br><br>
+        <b>Hex of Binding.</b> It lashes shadows to a target’s essence, 
+        squeezing until they crack.<br><br>
+        It might be exactly the edge you need… if it doesn’t break you first.
+      `);
+    } else {
+      setStory(`
+        You consult the Book of Shadows, but no new spells leap from the page yet.<br><br>
+        Still, your eyes keep drifting back to the symbol you copied from the demon’s ashes.
+        Whatever it is, it’s important — and it’s not done with you.
+      `);
+    }
+
+    setButtons([
+      {text:"Back to Sanctum Choices", action:hubScene}
+    ]);
+  }
+
+  function hubPatrol(){
+    setStory(`
+      You cloak yourself in a thin veil of concealment magic and step back into
+      Hollow Haven’s twisting streets.<br><br>
+      It doesn’t take long.<br><br>
+      Somewhere between the flickering neon and the old gas lamps, you feel it:
+      another wrongness, waiting just around the corner…
+    `);
+    setButtons([
+      {text:"Follow the wrongness", action:spawnRandomStreetEnemy}
+    ]);
+  }
+
+  function hubBossTease(){
+    setStory(`
+      Threads of red string on your wall connect every recent attack to a single,
+      ominous point deeper in the city’s underground.<br><br>
+      Whoever is leading these demons… they’re gathering strength.<br><br>
+      You know you’ll have to confront them. Just… not tonight.<br><br>
+      This is where <b>Chapter Two</b> will begin.
+    `);
+    setButtons([
+      {text:"Okay… I’ll be ready.", action:hubScene}
+    ]);
+  }
+
+  function endChapter(){
+    setStory(`
+      You dim the candles with a slow gesture. Wards flare softly around the house
+      like a second heartbeat.<br><br>
+      Tonight, you survived. You learned. You pushed back against the dark —
+      and the dark noticed.<br><br>
+      This is the end of <b>Chapter One</b> of your Charmed-inspired journey.
+      More demons await. More spells. More choices. More consequences.<br><br>
+      When you’re ready, you’ll open your eyes… and the night will begin again.
+    `);
+    setButtons([
+      {text:"Replay Chapter One", action:startGame}
+    ]);
+    logMsg("Chapter One marked complete.");
+  }
+
+  // Start
+  startGame();
+</script>
+
+</body>
+</html>
